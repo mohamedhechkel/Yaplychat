@@ -1,0 +1,1358 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yaply</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    animation: {
+                        'blob': 'blob 10s infinite',
+                    },
+                    keyframes: {
+                        blob: {
+                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --blob-1: #9333ea;
+            --blob-2: #06b6d4;
+            --blob-3: #2563eb;
+            --primary-gradient-from: #06b6d4;
+            --primary-gradient-to: #4f46e5;
+            --accent-color: #38bdf8;
+            --card-bg: rgba(255, 255, 255, 0.07);
+            --card-border: rgba(255, 255, 255, 0.15);
+            --text-accent: #38bdf8;
+        }
+
+        /* Preset Themes */
+        body[data-theme="cyan"] {
+            --bg-color: #0b0f19;
+            --blob-1: #9333ea;
+            --blob-2: #06b6d4;
+            --blob-3: #2563eb;
+            --primary-gradient-from: #06b6d4;
+            --primary-gradient-to: #4f46e5;
+            --accent-color: #38bdf8;
+            --text-accent: #38bdf8;
+        }
+
+        body[data-theme="cyberpunk"] {
+            --bg-color: #080312;
+            --blob-1: #ff007f;
+            --blob-2: #00f0ff;
+            --blob-3: #ffe600;
+            --primary-gradient-from: #ff007f;
+            --primary-gradient-to: #7928ca;
+            --accent-color: #00f0ff;
+            --text-accent: #ff007f;
+        }
+
+        body[data-theme="emerald"] {
+            --bg-color: #031710;
+            --blob-1: #059669;
+            --blob-2: #10b981;
+            --blob-3: #047857;
+            --primary-gradient-from: #10b981;
+            --primary-gradient-to: #059669;
+            --accent-color: #34d399;
+            --text-accent: #34d399;
+        }
+
+        body[data-theme="sunset"] {
+            --bg-color: #1a0c1a;
+            --blob-1: #f43f5e;
+            --blob-2: #fb923c;
+            --blob-3: #a855f7;
+            --primary-gradient-from: #f43f5e;
+            --primary-gradient-to: #ea580c;
+            --accent-color: #fb923c;
+            --text-accent: #fb923c;
+        }
+
+        body[data-theme="midnight"] {
+            --bg-color: #000000;
+            --blob-1: #334155;
+            --blob-2: #1e293b;
+            --blob-3: #475569;
+            --primary-gradient-from: #475569;
+            --primary-gradient-to: #1e293b;
+            --accent-color: #94a3b8;
+            --text-accent: #cbd5e1;
+        }
+
+        body[data-theme="amethyst"] {
+            --bg-color: #12071f;
+            --blob-1: #8b5cf6;
+            --blob-2: #d946ef;
+            --blob-3: #6366f1;
+            --primary-gradient-from: #a855f7;
+            --primary-gradient-to: #6366f1;
+            --accent-color: #e879f9;
+            --text-accent: #e879f9;
+        }
+
+        body[data-theme="ocean"] {
+            --bg-color: #031329;
+            --blob-1: #0284c7;
+            --blob-2: #0f766e;
+            --blob-3: #1d4ed8;
+            --primary-gradient-from: #0284c7;
+            --primary-gradient-to: #0f766e;
+            --accent-color: #38bdf8;
+            --text-accent: #38bdf8;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: #f3f4f6;
+            overflow-x: hidden;
+            transition: background-color 0.4s ease;
+        }
+
+        /* Glassmorphism styling */
+        .glass-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.03));
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--card-border);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+        }
+
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .glass-input {
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            transition: all 0.25s ease;
+        }
+
+        .glass-input:focus {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: var(--accent-color);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+            outline: none;
+        }
+
+        .glass-btn {
+            background: linear-gradient(135deg, var(--primary-gradient-from), var(--primary-gradient-to));
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-btn:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.15);
+        }
+
+        .glass-btn:active {
+            transform: translateY(0);
+        }
+
+        .glass-btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.2s ease;
+        }
+
+        .glass-btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.16);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        .blob-1 { background-color: var(--blob-1); }
+        .blob-2 { background-color: var(--blob-2); }
+        .blob-3 { background-color: var(--blob-3); }
+        .accent-text { color: var(--text-accent); }
+
+        /* Popover animations */
+        .popover-panel {
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+    </style>
+</head>
+<body data-theme="cyan" class="h-full flex flex-col justify-between relative selection:bg-cyan-500 selection:text-white pb-10">
+
+    <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <div class="absolute -top-40 -left-40 w-96 h-96 blob-1 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob transition-colors duration-500"></div>
+        <div class="absolute top-1/3 -right-20 w-96 h-96 blob-2 rounded-full mix-blend-multiply filter blur-3xl opacity-35 animate-blob transition-colors duration-500" style="animation-delay: 2s;"></div>
+        <div class="absolute -bottom-40 left-1/3 w-96 h-96 blob-3 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob transition-colors duration-500" style="animation-delay: 4s;"></div>
+    </div>
+
+    <!-- Notification Toast Container -->
+    <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-3 pointer-events-none"></div>
+
+    <div class="relative z-10 flex-1 flex flex-col h-full max-w-7xl w-full mx-auto p-3 sm:p-6">
+
+        <!-- App Header Bar -->
+        <header class="glass-card rounded-2xl px-6 py-4 mb-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-400 to-indigo-600 flex items-center justify-center text-white font-black text-xl shadow-lg border border-white/30">
+                    Y
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-wider accent-text">
+                        Yaply
+                    </h1>
+                </div>
+            </div>
+
+            <!-- Theme Picker & User Controls -->
+            <div class="flex items-center gap-3">
+                <div class="flex items-center gap-1 bg-white/5 border border-white/10 rounded-xl px-2.5 py-1.5">
+                    <i class="fa-solid fa-palette text-xs text-gray-400"></i>
+                    <select id="theme-select" class="bg-transparent text-xs text-white outline-none cursor-pointer">
+                        <option value="cyan" class="bg-slate-900 text-white">Default Cyan</option>
+                        <option value="cyberpunk" class="bg-slate-900 text-white">Cyberpunk</option>
+                        <option value="emerald" class="bg-slate-900 text-white">Emerald</option>
+                        <option value="sunset" class="bg-slate-900 text-white">Sunset</option>
+                        <option value="midnight" class="bg-slate-900 text-white">Midnight</option>
+                        <option value="amethyst" class="bg-slate-900 text-white">Amethyst</option>
+                        <option value="ocean" class="bg-slate-900 text-white">Ocean Deep</option>
+                    </select>
+                </div>
+
+                <!-- Profile Info (Visible when logged in) -->
+                <div id="user-header-info" class="hidden flex items-center gap-3">
+                    <div class="flex items-center gap-2 bg-white/5 border border-white/10 px-3 py-1.5 rounded-xl">
+                        <div id="user-avatar" class="w-7 h-7 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center font-bold text-xs text-white border border-white/20">
+                            U
+                        </div>
+                        <div class="text-left hidden sm:block">
+                            <div id="user-display-name" class="text-xs font-semibold text-white leading-tight">User</div>
+                            <div id="user-display-username" class="text-[10px] text-gray-400">@username</div>
+                        </div>
+                    </div>
+                    <button id="btn-signout" class="glass-btn-secondary px-3 py-1.5 rounded-xl text-xs text-red-300 hover:text-red-100 flex items-center gap-1.5 transition">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                        <span class="hidden sm:inline">Sign Out</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Authentication Screen -->
+        <div id="auth-screen" class="flex-1 flex items-center justify-center p-2">
+            <div class="glass-card w-full max-w-md rounded-3xl p-6 sm:p-8 relative overflow-hidden transition-all duration-300">
+
+                <!-- Auth Tabs -->
+                <div class="flex rounded-xl bg-black/30 p-1 mb-6 border border-white/10">
+                    <button id="tab-signin" class="flex-1 py-2 rounded-lg text-xs font-semibold transition text-white bg-white/15 shadow">Sign In</button>
+                    <button id="tab-signup" class="flex-1 py-2 rounded-lg text-xs font-semibold transition text-gray-400 hover:text-white">Sign Up</button>
+                </div>
+
+                <!-- SIGN IN FORM -->
+                <form id="form-signin" class="space-y-4">
+                    <div class="text-center mb-4">
+                        <h2 class="text-2xl font-bold text-white">Welcome Back</h2>
+                        <p class="text-xs text-gray-400 mt-1">Sign in to start yapping</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-gray-300 mb-1">Username</label>
+                        <div class="relative">
+                            <i class="fa-solid fa-user absolute left-3.5 top-3.5 text-xs text-gray-400"></i>
+                            <input type="text" id="signin-username" required placeholder="Username" class="w-full glass-input pl-10 pr-4 py-2.5 rounded-xl text-sm">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-gray-300 mb-1">Password</label>
+                        <div class="relative">
+                            <i class="fa-solid fa-lock absolute left-3.5 top-3.5 text-xs text-gray-400"></i>
+                            <input type="password" id="signin-password" required placeholder="Password" class="w-full glass-input pl-10 pr-4 py-2.5 rounded-xl text-sm">
+                        </div>
+                    </div>
+
+                    <button type="submit" id="btn-signin-submit" class="w-full glass-btn py-3 rounded-xl font-semibold text-sm text-white mt-2 flex items-center justify-center gap-2">
+                        <span>Sign In</span>
+                        <i class="fa-solid fa-arrow-right text-xs"></i>
+                    </button>
+                </form>
+
+                <!-- SIGN UP FORM -->
+                <form id="form-signup" class="space-y-3 hidden">
+                    <div class="text-center mb-3">
+                        <h2 class="text-2xl font-bold text-white">Create Account</h2>
+                        <p class="text-xs text-gray-400 mt-1">Join the Yaply community</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-[11px] font-medium text-gray-300 mb-1">First Name</label>
+                            <input type="text" id="signup-firstname" required placeholder="First Name" class="w-full glass-input px-3 py-2 rounded-xl text-xs">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-medium text-gray-300 mb-1">Last Name</label>
+                            <input type="text" id="signup-lastname" required placeholder="Last Name" class="w-full glass-input px-3 py-2 rounded-xl text-xs">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-medium text-gray-300 mb-1">Username</label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-2 text-xs text-gray-400 font-bold">@</span>
+                            <input type="text" id="signup-username" required placeholder="Username" class="w-full glass-input pl-8 pr-3 py-2 rounded-xl text-xs">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-medium text-gray-300 mb-1">Date of Birth</label>
+                        <input type="date" id="signup-dob" required class="w-full glass-input px-3 py-2 rounded-xl text-xs text-gray-300">
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-medium text-gray-300 mb-1">Password</label>
+                        <div class="relative">
+                            <i class="fa-solid fa-key absolute left-3 top-2.5 text-xs text-gray-400"></i>
+                            <input type="password" id="signup-password" required placeholder="Password (min 6 characters)" minlength="6" class="w-full glass-input pl-8 pr-3 py-2 rounded-xl text-xs">
+                        </div>
+                    </div>
+
+                    <button type="submit" id="btn-signup-submit" class="w-full glass-btn py-2.5 rounded-xl font-semibold text-xs text-white mt-2 flex items-center justify-center gap-2">
+                        <span>Create Account</span>
+                        <i class="fa-solid fa-user-plus text-xs"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Lobby Screen -->
+        <div id="lobby-screen" class="hidden flex-1 flex flex-col md:flex-row gap-4 h-[calc(100vh-140px)] overflow-hidden">
+            
+            <!-- Left Sidebar Controls: Create Room & Join ID -->
+            <div class="w-full md:w-80 flex flex-col gap-4">
+                
+                <!-- Create Room Card -->
+                <div class="glass-card rounded-2xl p-4 space-y-3">
+                    <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-plus-circle accent-text"></i> Create Room
+                    </h3>
+                    <form id="form-create-room" class="space-y-2.5">
+                        <input type="text" id="room-name" required placeholder="Room Name" class="w-full glass-input px-3 py-2 rounded-xl text-xs">
+                        
+                        <div class="flex items-center justify-between bg-white/5 p-2 rounded-xl border border-white/10 text-xs">
+                            <span class="text-gray-300 font-medium">Type</span>
+                            <div class="flex gap-2">
+                                <label class="cursor-pointer flex items-center gap-1">
+                                    <input type="radio" name="room-privacy" value="public" checked class="accent-cyan-400">
+                                    <span class="text-gray-300 text-[11px]">Public</span>
+                                </label>
+                                <label class="cursor-pointer flex items-center gap-1">
+                                    <input type="radio" name="room-privacy" value="private" class="accent-cyan-400">
+                                    <span class="text-gray-300 text-[11px]">Private</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Room Password Toggle Container -->
+                        <div id="room-password-container" class="space-y-2">
+                            <div class="flex items-center justify-between text-xs px-1">
+                                <label for="toggle-room-pass" class="text-gray-300 cursor-pointer text-[11px]">Password Protect?</label>
+                                <input type="checkbox" id="toggle-room-pass" class="accent-cyan-400 rounded cursor-pointer">
+                            </div>
+                            <input type="password" id="room-password" placeholder="Room Password" class="w-full glass-input px-3 py-2 rounded-xl text-xs hidden">
+                        </div>
+
+                        <button type="submit" class="w-full glass-btn py-2 rounded-xl font-semibold text-xs text-white flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-comments"></i> Launch Room
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Join by 6-digit ID Card -->
+                <div class="glass-card rounded-2xl p-4 space-y-3">
+                    <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-key accent-text"></i> Join by 6-Digit ID
+                    </h3>
+                    <form id="form-join-id" class="flex gap-2">
+                        <input type="text" id="input-join-id" required maxlength="6" pattern="[0-9]{6}" placeholder="6-digit ID" class="flex-1 glass-input px-3 py-2 rounded-xl text-xs font-mono text-center tracking-widest">
+                        <button type="submit" class="glass-btn px-4 py-2 rounded-xl font-semibold text-xs text-white">
+                            Join
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Active Public Rooms Feed -->
+            <div class="flex-1 glass-card rounded-2xl p-4 sm:p-6 flex flex-col min-h-0">
+                <div class="flex items-center justify-between mb-4 pb-3 border-b border-white/10">
+                    <div>
+                        <h2 class="text-base font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-globe accent-text"></i> Public Rooms
+                        </h2>
+                    </div>
+                    <span id="room-count-badge" class="px-2.5 py-1 bg-white/10 text-white border border-white/20 rounded-full text-[10px] font-semibold">
+                        0 Active
+                    </span>
+                </div>
+
+                <!-- Rooms Grid List -->
+                <div id="rooms-list" class="flex-1 overflow-y-auto pr-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 auto-rows-max">
+                    <div class="col-span-full flex flex-col items-center justify-center py-12 text-gray-400 text-center">
+                        <i class="fa-solid fa-spinner fa-spin text-2xl accent-text mb-2"></i>
+                        <p class="text-xs">Loading rooms...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Chat Room Screen -->
+        <div id="chat-screen" class="hidden flex-1 glass-card rounded-3xl flex flex-col h-[calc(100vh-140px)] overflow-hidden shadow-2xl relative">
+            
+            <!-- Chat Header -->
+            <div class="px-4 py-3 bg-slate-900/60 backdrop-blur-md border-b border-white/10 flex items-center justify-between z-20">
+                
+                <!-- TOP LEFT: 6-DIGIT ROOM ID DISPLAY BADGE -->
+                <div class="flex items-center gap-3">
+                    <button id="btn-leave-room" class="glass-btn-secondary w-8 h-8 rounded-xl flex items-center justify-center text-gray-300 hover:text-white text-xs">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h2 id="chat-title" class="text-sm font-bold text-white">Room Name</h2>
+                            <span id="chat-privacy-badge" class="px-2 py-0.5 text-[9px] font-semibold rounded-full bg-white/10 text-white border border-white/20">Public</span>
+                        </div>
+                        
+                        <!-- 6-Digit ID Display -->
+                        <div class="flex items-center gap-1.5 mt-0.5">
+                            <span class="text-[10px] text-gray-400">ID:</span>
+                            <code id="chat-room-id" class="text-[11px] font-mono font-bold bg-black/40 px-2 py-0.5 rounded accent-text border border-white/10 select-all">------</code>
+                            <button id="btn-copy-id" class="text-[10px] text-gray-400 hover:text-white transition" title="Copy 6-Digit ID">
+                                <i class="fa-regular fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <span class="flex items-center gap-1.5 text-[10px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-full">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span> Live Chat
+                    </span>
+                </div>
+            </div>
+
+            <!-- Chat Messages Display Feed -->
+            <div id="messages-container" class="flex-1 overflow-y-auto p-4 space-y-3">
+            </div>
+
+            <!-- Chat Message Input Bar -->
+            <div class="p-3 sm:p-4 bg-slate-900/80 backdrop-blur-md border-t border-white/10 z-20 relative">
+                
+                <!-- Pending Attachment Preview Banner -->
+                <div id="attachment-preview-bar" class="hidden mb-3 p-2.5 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-between">
+                    <div class="flex items-center gap-3 overflow-hidden">
+                        <div id="attachment-preview-icon" class="w-10 h-10 rounded-xl bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 flex items-center justify-center shrink-0">
+                            <i class="fa-solid fa-paperclip"></i>
+                        </div>
+                        <div class="truncate">
+                            <p id="attachment-preview-name" class="text-xs font-semibold text-white truncate">file.png</p>
+                            <p id="attachment-preview-size" class="text-[10px] text-gray-400">0 KB</p>
+                        </div>
+                    </div>
+                    <button type="button" id="btn-remove-attachment" class="w-7 h-7 rounded-xl bg-white/10 hover:bg-white/20 text-gray-300 hover:text-white flex items-center justify-center text-xs transition">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <!-- Emoji Picker Popover -->
+                <div id="emoji-picker-popover" class="hidden absolute bottom-20 left-4 z-50 glass-card p-3 rounded-2xl w-72 sm:w-80 shadow-2xl border border-white/15 animate-in fade-in slide-in-from-bottom-2">
+                    <div class="flex items-center justify-between pb-2 mb-2 border-b border-white/10 text-xs">
+                        <span class="font-bold text-white flex items-center gap-1.5"><i class="fa-regular fa-face-smile text-cyan-400"></i> Emojis</span>
+                        <div class="flex gap-1 text-[11px]" id="emoji-category-tabs">
+                            <button type="button" data-cat="smileys" class="px-2 py-0.5 rounded bg-white/10 text-white font-medium">😃</button>
+                            <button type="button" data-cat="gestures" class="px-2 py-0.5 rounded text-gray-400 hover:text-white">👍</button>
+                            <button type="button" data-cat="hearts" class="px-2 py-0.5 rounded text-gray-400 hover:text-white">❤️</button>
+                            <button type="button" data-cat="objects" class="px-2 py-0.5 rounded text-gray-400 hover:text-white">🔥</button>
+                        </div>
+                    </div>
+                    <div id="emoji-grid" class="grid grid-cols-7 gap-1 max-h-48 overflow-y-auto text-xl p-1 text-center">
+                        <!-- Rendered by JS -->
+                    </div>
+                </div>
+
+                <!-- Attachment Options Popover -->
+                <div id="attachment-popover" class="hidden absolute bottom-20 left-12 z-50 glass-card p-3 rounded-2xl w-64 shadow-2xl border border-white/15">
+                    <p class="text-[11px] font-bold text-gray-400 mb-2 uppercase tracking-wider px-1">Add Attachment</p>
+                    <div class="space-y-1">
+                        <label class="flex items-center gap-3 p-2 rounded-xl hover:bg-white/10 cursor-pointer text-xs text-white transition">
+                            <i class="fa-solid fa-image text-emerald-400 text-sm w-5 text-center"></i>
+                            <div>
+                                <div class="font-semibold">Upload Image</div>
+                                <div class="text-[10px] text-gray-400">PNG, JPG, GIF</div>
+                            </div>
+                            <input type="file" id="input-file-image" accept="image/*" class="hidden">
+                        </label>
+                        <label class="flex items-center gap-3 p-2 rounded-xl hover:bg-white/10 cursor-pointer text-xs text-white transition">
+                            <i class="fa-solid fa-file-lines text-cyan-400 text-sm w-5 text-center"></i>
+                            <div>
+                                <div class="font-semibold">Document / File</div>
+                                <div class="text-[10px] text-gray-400">PDF, DOC, TXT, etc.</div>
+                            </div>
+                            <input type="file" id="input-file-doc" class="hidden">
+                        </label>
+                        <button type="button" id="btn-attach-url" class="w-full flex items-center gap-3 p-2 rounded-xl hover:bg-white/10 text-xs text-white text-left transition">
+                            <i class="fa-solid fa-link text-amber-400 text-sm w-5 text-center"></i>
+                            <div>
+                                <div class="font-semibold">Image Web Link</div>
+                                <div class="text-[10px] text-gray-400">Paste direct image URL</div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Chat Input Form -->
+                <form id="form-send-message" class="flex items-center gap-2">
+                    <div class="flex items-center gap-1 bg-white/5 border border-white/10 rounded-2xl px-2 py-1">
+                        <!-- Attachment Button -->
+                        <button type="button" id="btn-toggle-attach" class="w-9 h-9 rounded-xl flex items-center justify-center text-gray-400 hover:text-cyan-300 hover:bg-white/10 transition text-sm" title="Add Attachment">
+                            <i class="fa-solid fa-paperclip"></i>
+                        </button>
+                        <!-- Emoji Button -->
+                        <button type="button" id="btn-toggle-emoji" class="w-9 h-9 rounded-xl flex items-center justify-center text-gray-400 hover:text-amber-300 hover:bg-white/10 transition text-sm" title="Insert Emoji">
+                            <i class="fa-regular fa-face-smile"></i>
+                        </button>
+                    </div>
+
+                    <input type="text" id="input-message" placeholder="Type a message..." autocomplete="off" class="flex-1 glass-input px-4 py-3 rounded-2xl text-xs sm:text-sm">
+                    
+                    <button type="submit" class="glass-btn px-5 py-3 rounded-2xl text-white font-semibold flex items-center justify-center gap-2 text-sm">
+                        <span class="hidden sm:inline">Send</span>
+                        <i class="fa-solid fa-paper-plane text-xs"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Password Modal for Locked Rooms -->
+    <div id="password-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4 hidden">
+    <!-- Password Modal for Locked Rooms -->
+    <div id="password-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-md flex items-center justify-center p-4 hidden">
+        <div class="glass-card max-w-sm w-full p-6 rounded-3xl space-y-4">
+            <div class="text-center">
+                <div class="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center justify-center mx-auto mb-2 text-xl">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <h3 class="text-lg font-bold text-white">Protected Room</h3>
+                <p class="text-xs text-gray-400 mt-1">Enter password to join this room</p>
+            </div>
+            <div>
+                <input type="password" id="modal-room-password" placeholder="Password" class="w-full glass-input px-3 py-2.5 rounded-xl text-xs text-center">
+            </div>
+            <div class="flex gap-2">
+                <button id="btn-cancel-pass-modal" class="flex-1 glass-btn-secondary py-2 rounded-xl text-xs text-gray-300">Cancel</button>
+                <button id="btn-submit-pass-modal" class="flex-1 glass-btn py-2 rounded-xl text-xs text-white font-semibold">Join</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Viewer Modal -->
+    <div id="image-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-lg flex items-center justify-center p-4 hidden" onclick="this.classList.add('hidden')">
+        <div class="relative max-w-4xl max-h-[85vh] overflow-hidden rounded-2xl border border-white/20 shadow-2xl">
+            <img id="image-modal-src" src="" alt="Attachment Preview" class="max-w-full max-h-[85vh] object-contain">
+            <button type="button" class="absolute top-3 right-3 w-9 h-9 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-black/90 transition">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Bottom Left Credit -->
+    <div class="fixed bottom-3 left-3 z-40 text-[11px] font-semibold text-white/70 bg-black/40 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/10 select-none">
+        Made by Mohamed Hechkel
+    </div>
+
+    <!-- Application JavaScript Engine -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { 
+            getAuth, 
+            createUserWithEmailAndPassword, 
+            signInWithEmailAndPassword, 
+            signOut, 
+            onAuthStateChanged 
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+            getFirestore, 
+            collection, 
+            doc, 
+            setDoc, 
+            getDoc, 
+            getDocs, 
+            onSnapshot 
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDDdZ0ZVa9zHTPkY9NXzKcgGsHoqUBNFs8",
+            authDomain: "yaplychat.firebaseapp.com",
+            projectId: "yaplychat",
+            storageBucket: "yaplychat.firebasestorage.app",
+            messagingSenderId: "261363878342",
+            appId: "1:261363878342:web:ef56710f400c9d73f34ac7",
+            measurementId: "G-VKL5WZ3YJW"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'yaply-chat-app';
+        
+        // Firestore Collection References
+        const usersCol = collection(db, 'artifacts', appId, 'public', 'data', 'users');
+        const roomsCol = collection(db, 'artifacts', appId, 'public', 'data', 'rooms');
+        const messagesCol = collection(db, 'artifacts', appId, 'public', 'data', 'messages');
+
+        // Global Application State
+        let currentUserData = null;
+        let currentRoom = null;
+        let unsubscribeRooms = null;
+        let unsubscribeMessages = null;
+        let targetProtectedRoom = null;
+        let pendingAttachment = null;
+
+        // Emoji Dictionary Categories
+        const EMOJI_SETS = {
+            smileys: ['😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '🥹', '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🥸', '🤩', '🥳', '😏', '😒', '😞', '😔', '😟', '😕', '🙁', '😣', '😖', '😫', '😩', '🥺', '😢', '😭', '😮‍💨', '😤', '😠', '😡', '🤬', '🤯', '😳', '🥵', '🥶', '😱', '😨', '😰', '😥', '😓', '🫣', '🤗', '🫡', '🤔', '🫣', '🤭', '🥱', '😴', '🤤'],
+            gestures: ['👋', '🤚', '🖐️', '✋', '🖖', '🫱', '🫲', '🫳', '🫴', '👌', '🤌', '🤏', '✌️', '🤞', '🫰', '🤟', '🤘', '🤙', '👈', '👉', '👆', '🖕', '👇', '☝️', '🫵', '👍', '👎', '✊', '👊', '🤛', '🤜', '👏', '🙌', '🫶', '👐', '🤲', '🤝', '🙏', '✍️', '💅', '🤳', '💪'],
+            hearts: ['❤️', '🩷', '🧡', '💛', '💚', '💙', '🩵', '💜', '🖤', '🩶', '🤍', '🤎', '💔', '❤️‍🔥', '❤️‍🩹', '❣️', '💕', '💞', '💓', '💗', '💖', '💘', '💝', '💟', '✨', '🌟', '💫', '💥', '💢', '💦', '💨'],
+            objects: ['🔥', '🎉', '🎊', '🎈', '🎁', '🏆', '👑', '💎', '🚀', '⚡', '💡', '💬', '📢', '🔔', '🎮', '🎧', '📷', '📱', '💻', '🔮', '🎨', '🍕', '🍔', '🍟', '🍩', '☕', '🍺', '⚽', '🏀', '🚗', '🌈']
+        };
+
+        // Initialize Emoji Picker Grid
+        function renderEmojiGrid(category = 'smileys') {
+            const container = document.getElementById('emoji-grid');
+            const list = EMOJI_SETS[category] || EMOJI_SETS.smileys;
+            container.innerHTML = list.map(emoji => `
+                <button type="button" class="emoji-btn hover:bg-white/10 rounded-lg py-1 transition transform hover:scale-125" data-emoji="${emoji}">
+                    ${emoji}
+                </button>
+            `).join('');
+
+            container.querySelectorAll('.emoji-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const emoji = e.currentTarget.getAttribute('data-emoji');
+                    const msgInput = document.getElementById('input-message');
+                    msgInput.value += emoji;
+                    msgInput.focus();
+                });
+            });
+        }
+        renderEmojiGrid('smileys');
+
+        // Emoji Tabs Switching
+        document.querySelectorAll('#emoji-category-tabs button').forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                const cat = e.currentTarget.getAttribute('data-cat');
+                document.querySelectorAll('#emoji-category-tabs button').forEach(b => {
+                    b.className = "px-2 py-0.5 rounded text-gray-400 hover:text-white";
+                });
+                e.currentTarget.className = "px-2 py-0.5 rounded bg-white/10 text-white font-medium";
+                renderEmojiGrid(cat);
+            });
+        });
+
+        // Popovers Toggle Listeners
+        const btnToggleEmoji = document.getElementById('btn-toggle-emoji');
+        const btnToggleAttach = document.getElementById('btn-toggle-attach');
+        const emojiPopover = document.getElementById('emoji-picker-popover');
+        const attachPopover = document.getElementById('attachment-popover');
+
+        btnToggleEmoji.addEventListener('click', (e) => {
+            e.stopPropagation();
+            attachPopover.classList.add('hidden');
+            emojiPopover.classList.toggle('hidden');
+        });
+
+        btnToggleAttach.addEventListener('click', (e) => {
+            e.stopPropagation();
+            emojiPopover.classList.add('hidden');
+            attachPopover.classList.toggle('hidden');
+        });
+
+        // Close popovers on outside click
+        document.addEventListener('click', (e) => {
+            if (!emojiPopover.contains(e.target) && e.target !== btnToggleEmoji) {
+                emojiPopover.classList.add('hidden');
+            }
+            if (!attachPopover.contains(e.target) && e.target !== btnToggleAttach) {
+                attachPopover.classList.add('hidden');
+            }
+        });
+
+        // Attach File Handlers
+        const inputFileImage = document.getElementById('input-file-image');
+        const inputFileDoc = document.getElementById('input-file-doc');
+        const btnAttachUrl = document.getElementById('btn-attach-url');
+
+        inputFileImage.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                setPendingAttachment({
+                    type: 'image',
+                    name: file.name,
+                    size: formatFileSize(file.size),
+                    url: event.target.result
+                });
+            };
+            reader.readAsDataURL(file);
+            attachPopover.classList.add('hidden');
+            inputFileImage.value = '';
+        });
+
+        inputFileDoc.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                setPendingAttachment({
+                    type: 'file',
+                    name: file.name,
+                    size: formatFileSize(file.size),
+                    url: event.target.result
+                });
+            };
+            reader.readAsDataURL(file);
+            attachPopover.classList.add('hidden');
+            inputFileDoc.value = '';
+        });
+
+        btnAttachUrl.addEventListener('click', () => {
+            const url = prompt('Enter Image Web URL (e.g. https://domain.com/photo.jpg):');
+            if (url && url.trim()) {
+                setPendingAttachment({
+                    type: 'image',
+                    name: 'Web Image',
+                    size: 'URL Link',
+                    url: url.trim()
+                });
+            }
+            attachPopover.classList.add('hidden');
+        });
+
+        function setPendingAttachment(att) {
+            pendingAttachment = att;
+            const bar = document.getElementById('attachment-preview-bar');
+            const icon = document.getElementById('attachment-preview-icon');
+            const name = document.getElementById('attachment-preview-name');
+            const size = document.getElementById('attachment-preview-size');
+
+            name.textContent = att.name;
+            size.textContent = att.size;
+
+            if (att.type === 'image') {
+                icon.innerHTML = `<img src="${att.url}" class="w-full h-full object-cover rounded-xl">`;
+            } else {
+                icon.innerHTML = `<i class="fa-solid fa-file-lines"></i>`;
+            }
+
+            bar.classList.remove('hidden');
+        }
+
+        document.getElementById('btn-remove-attachment').addEventListener('click', () => {
+            pendingAttachment = null;
+            document.getElementById('attachment-preview-bar').classList.add('hidden');
+        });
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+        }
+
+        window.viewAttachmentModal = (src) => {
+            const modal = document.getElementById('image-modal');
+            const img = document.getElementById('image-modal-src');
+            img.src = src;
+            modal.classList.remove('hidden');
+        };
+
+        // Theme Switcher Handler
+        const themeSelect = document.getElementById('theme-select');
+        themeSelect.addEventListener('change', (e) => {
+            document.body.setAttribute('data-theme', e.target.value);
+        });
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            const bgClass = type === 'error' 
+                ? 'bg-red-500/20 border-red-500/40 text-red-200' 
+                : type === 'success' 
+                ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-200'
+                : 'bg-white/10 border-white/20 text-white';
+
+            const icon = type === 'error' ? 'fa-triangle-exclamation' : type === 'success' ? 'fa-circle-check' : 'fa-circle-info';
+
+            toast.className = `pointer-events-auto flex items-center gap-2 px-4 py-3 rounded-2xl border backdrop-blur-xl shadow-xl text-xs font-medium transition-all duration-300 transform translate-y-2 opacity-0 ${bgClass}`;
+            toast.innerHTML = `<i class="fa-solid ${icon}"></i> <span>${message}</span>`;
+            
+            container.appendChild(toast);
+
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            });
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', '-translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        const tabSignin = document.getElementById('tab-signin');
+        const tabSignup = document.getElementById('tab-signup');
+        const formSignin = document.getElementById('form-signin');
+        const formSignup = document.getElementById('form-signup');
+
+        tabSignin.addEventListener('click', () => {
+            tabSignin.className = "flex-1 py-2 rounded-lg text-xs font-semibold transition text-white bg-white/15 shadow";
+            tabSignup.className = "flex-1 py-2 rounded-lg text-xs font-semibold transition text-gray-400 hover:text-white";
+            formSignin.classList.remove('hidden');
+            formSignup.classList.add('hidden');
+        });
+
+        tabSignup.addEventListener('click', () => {
+            tabSignup.className = "flex-1 py-2 rounded-lg text-xs font-semibold transition text-white bg-white/15 shadow";
+            tabSignin.className = "flex-1 py-2 rounded-lg text-xs font-semibold transition text-gray-400 hover:text-white";
+            formSignup.classList.remove('hidden');
+            formSignin.classList.add('hidden');
+        });
+
+        document.getElementById('toggle-room-pass').addEventListener('change', (e) => {
+            const passInput = document.getElementById('room-password');
+            if (e.target.checked) {
+                passInput.classList.remove('hidden');
+                passInput.required = true;
+            } else {
+                passInput.classList.add('hidden');
+                passInput.required = false;
+                passInput.value = '';
+            }
+        });
+
+        // Registration Submission
+        formSignup.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const firstName = document.getElementById('signup-firstname').value.trim();
+            const lastName = document.getElementById('signup-lastname').value.trim();
+            const username = document.getElementById('signup-username').value.trim().toLowerCase();
+            const dob = document.getElementById('signup-dob').value;
+            const password = document.getElementById('signup-password').value;
+
+            if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+                showToast('Username can only contain letters, numbers, and underscores', 'error');
+                return;
+            }
+
+            try {
+                // Check if username is already taken
+                const snapshot = await getDocs(usersCol);
+                const isTaken = snapshot.docs.some(doc => {
+                    const data = doc.data();
+                    return data.username && data.username.toLowerCase() === username;
+                });
+
+                if (isTaken) {
+                    showToast(`@${username} is already taken! Choose another.`, 'error');
+                    return;
+                }
+
+                const userEmail = `${username}@yaply.app`;
+                const userCred = await createUserWithEmailAndPassword(auth, userEmail, password);
+
+                const userData = {
+                    uid: userCred.user.uid,
+                    firstName: firstName,
+                    lastName: lastName,
+                    username: username,
+                    dob: dob,
+                    createdAt: new Date().toISOString()
+                };
+
+                await setDoc(doc(usersCol, userCred.user.uid), userData);
+                showToast(`Welcome to Yaply, ${firstName}!`, 'success');
+
+            } catch (error) {
+                console.error("Sign Up Error:", error);
+                showToast(error.message.replace('Firebase: ', ''), 'error');
+            }
+        });
+
+        // Sign In Submission
+        formSignin.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('signin-username').value.trim().toLowerCase();
+            const password = document.getElementById('signin-password').value;
+
+            try {
+                const userEmail = `${username}@yaply.app`;
+                await signInWithEmailAndPassword(auth, userEmail, password);
+                showToast('Signed in successfully', 'success');
+            } catch (error) {
+                console.error("Sign In Error:", error);
+                showToast('Invalid username or password', 'error');
+            }
+        });
+
+        // Sign Out Listener
+        document.getElementById('btn-signout').addEventListener('click', async () => {
+            if (currentRoom) leaveRoom();
+            await signOut(auth);
+            showToast('Signed out', 'info');
+        });
+
+        // Firebase Auth State Observer
+        onAuthStateChanged(auth, async (user) => {
+            const authScreen = document.getElementById('auth-screen');
+            const lobbyScreen = document.getElementById('lobby-screen');
+            const chatScreen = document.getElementById('chat-screen');
+            const userHeaderInfo = document.getElementById('user-header-info');
+
+            if (user) {
+                try {
+                    const userDoc = await getDoc(doc(usersCol, user.uid));
+                    if (userDoc.exists()) {
+                        currentUserData = userDoc.data();
+                    } else {
+                        currentUserData = {
+                            firstName: 'User',
+                            lastName: '',
+                            username: user.email.split('@')[0],
+                            uid: user.uid
+                        };
+                    }
+                } catch (e) {
+                    currentUserData = { firstName: 'User', lastName: '', username: 'user', uid: user.uid };
+                }
+
+                document.getElementById('user-display-name').textContent = `${currentUserData.firstName} ${currentUserData.lastName}`;
+                document.getElementById('user-display-username').textContent = `@${currentUserData.username}`;
+                document.getElementById('user-avatar').textContent = (currentUserData.firstName[0] || 'U').toUpperCase();
+                
+                authScreen.classList.add('hidden');
+                userHeaderInfo.classList.remove('hidden');
+
+                if (!currentRoom) {
+                    lobbyScreen.classList.remove('hidden');
+                    chatScreen.classList.add('hidden');
+                }
+
+                subscribeToRooms();
+
+            } else {
+                currentUserData = null;
+                currentRoom = null;
+                if (unsubscribeRooms) unsubscribeRooms();
+                if (unsubscribeMessages) unsubscribeMessages();
+
+                authScreen.classList.remove('hidden');
+                lobbyScreen.classList.add('hidden');
+                chatScreen.classList.add('hidden');
+                userHeaderInfo.classList.add('hidden');
+            }
+        });
+
+        function generate6DigitId() {
+            return Math.floor(100000 + Math.random() * 900000).toString();
+        }
+
+        // Room Creation
+        document.getElementById('form-create-room').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!currentUserData) return;
+
+            const name = document.getElementById('room-name').value.trim();
+            const privacy = document.querySelector('input[name="room-privacy"]:checked').value;
+            const hasPass = document.getElementById('toggle-room-pass').checked;
+            const password = hasPass ? document.getElementById('room-password').value : '';
+
+            const numeric6DigitId = generate6DigitId();
+
+            try {
+                const newRoomRef = doc(roomsCol, numeric6DigitId);
+                const roomData = {
+                    id: numeric6DigitId,
+                    name: name,
+                    privacy: privacy,
+                    hasPassword: Boolean(hasPass && password),
+                    password: password,
+                    createdBy: currentUserData.uid,
+                    createdByName: `@${currentUserData.username}`,
+                    createdAt: new Date().toISOString()
+                };
+
+                await setDoc(newRoomRef, roomData);
+                showToast(`Room created! ID: ${numeric6DigitId}`, 'success');
+                
+                document.getElementById('form-create-room').reset();
+                document.getElementById('room-password').classList.add('hidden');
+
+                enterRoom(roomData);
+
+            } catch (err) {
+                console.error("Create room error:", err);
+                showToast('Failed to create room', 'error');
+            }
+        });
+
+        // Join Room by 6-Digit ID
+        document.getElementById('form-join-id').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const roomId = document.getElementById('input-join-id').value.trim();
+            if (!roomId || roomId.length !== 6) {
+                showToast('Please enter a valid 6-digit Room ID', 'error');
+                return;
+            }
+
+            try {
+                const roomDoc = await getDoc(doc(roomsCol, roomId));
+                if (!roomDoc.exists()) {
+                    showToast('Room not found. Check the 6-digit ID.', 'error');
+                    return;
+                }
+
+                const room = roomDoc.data();
+                if (room.hasPassword) {
+                    promptPasswordModal(room);
+                } else {
+                    enterRoom(room);
+                }
+
+            } catch (err) {
+                console.error("Join room error:", err);
+                showToast('Error joining room', 'error');
+            }
+        });
+
+        // Realtime Subscription to Rooms List
+        function subscribeToRooms() {
+            if (unsubscribeRooms) unsubscribeRooms();
+
+            unsubscribeRooms = onSnapshot(roomsCol, (snapshot) => {
+                const roomsContainer = document.getElementById('rooms-list');
+                const badge = document.getElementById('room-count-badge');
+                
+                const allRooms = snapshot.docs.map(doc => doc.data());
+                const publicRooms = allRooms.filter(r => r.privacy === 'public');
+
+                badge.textContent = `${publicRooms.length} Active`;
+
+                if (publicRooms.length === 0) {
+                    roomsContainer.innerHTML = `
+                        <div class="col-span-full flex flex-col items-center justify-center py-12 text-gray-400 text-center">
+                            <i class="fa-solid fa-ghost text-3xl mb-2 accent-text opacity-50"></i>
+                            <p class="text-xs">No public rooms available right now.</p>
+                        </div>`;
+                    return;
+                }
+
+                roomsContainer.innerHTML = publicRooms.map(room => `
+                    <div class="glass-card rounded-2xl p-3.5 flex flex-col justify-between hover:border-white/30 transition group">
+                        <div class="space-y-1">
+                            <div class="flex items-start justify-between gap-1">
+                                <h4 class="text-xs font-bold text-white truncate group-hover:text-cyan-300 transition">${escapeHTML(room.name)}</h4>
+                                ${room.hasPassword ? '<i class="fa-solid fa-lock text-[10px] text-amber-400" title="Password Protected"></i>' : ''}
+                            </div>
+                            <p class="text-[10px] text-gray-400">Host: ${escapeHTML(room.createdByName || 'User')}</p>
+                        </div>
+                        <div class="mt-3 pt-2 border-t border-white/10 flex items-center justify-between">
+                            <code class="text-[10px] font-mono font-bold bg-black/40 px-2 py-0.5 rounded accent-text">ID: ${room.id}</code>
+                            <button onclick="window.attemptJoinRoom('${room.id}')" class="glass-btn px-3 py-1 rounded-lg text-[11px] font-semibold text-white">
+                                Enter
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }, (error) => {
+                console.error("Rooms snapshot error:", error);
+            });
+        }
+
+        window.attemptJoinRoom = async (roomId) => {
+            try {
+                const roomDoc = await getDoc(doc(roomsCol, roomId));
+                if (roomDoc.exists()) {
+                    const room = roomDoc.data();
+                    if (room.hasPassword) {
+                        promptPasswordModal(room);
+                    } else {
+                        enterRoom(room);
+                    }
+                }
+            } catch (err) {
+                showToast('Could not access room', 'error');
+            }
+        };
+
+        function promptPasswordModal(room) {
+            targetProtectedRoom = room;
+            document.getElementById('modal-room-password').value = '';
+            document.getElementById('password-modal').classList.remove('hidden');
+        }
+
+        document.getElementById('btn-cancel-pass-modal').addEventListener('click', () => {
+            targetProtectedRoom = null;
+            document.getElementById('password-modal').classList.add('hidden');
+        });
+
+        document.getElementById('btn-submit-pass-modal').addEventListener('click', () => {
+            if (!targetProtectedRoom) return;
+            const entered = document.getElementById('modal-room-password').value;
+            if (entered === targetProtectedRoom.password) {
+                document.getElementById('password-modal').classList.add('hidden');
+                enterRoom(targetProtectedRoom);
+                targetProtectedRoom = null;
+            } else {
+                showToast('Incorrect password', 'error');
+            }
+        });
+
+        function enterRoom(room) {
+            currentRoom = room;
+
+            document.getElementById('lobby-screen').classList.add('hidden');
+            document.getElementById('chat-screen').classList.remove('hidden');
+
+            document.getElementById('chat-title').textContent = room.name;
+            document.getElementById('chat-room-id').textContent = room.id;
+            
+            const badge = document.getElementById('chat-privacy-badge');
+            badge.textContent = room.privacy === 'public' ? 'Public' : 'Private';
+
+            subscribeToMessages(room.id);
+        }
+
+        function leaveRoom() {
+            if (unsubscribeMessages) unsubscribeMessages();
+            currentRoom = null;
+            document.getElementById('chat-screen').classList.add('hidden');
+            document.getElementById('lobby-screen').classList.remove('hidden');
+        }
+
+        document.getElementById('btn-leave-room').addEventListener('click', leaveRoom);
+
+        // Copy 6-Digit Room ID
+        document.getElementById('btn-copy-id').addEventListener('click', () => {
+            if (!currentRoom) return;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(currentRoom.id).then(() => {
+                    showToast('Room ID copied to clipboard', 'success');
+                }).catch(() => {
+                    fallbackCopyText(currentRoom.id);
+                });
+            } else {
+                fallbackCopyText(currentRoom.id);
+            }
+        });
+
+        function fallbackCopyText(text) {
+            const tempInput = document.createElement('input');
+            tempInput.value = text;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+            showToast('Room ID copied to clipboard', 'success');
+        }
+
+        // Realtime Subscription to Messages Feed
+        function subscribeToMessages(roomId) {
+            if (unsubscribeMessages) unsubscribeMessages();
+
+            const messagesContainer = document.getElementById('messages-container');
+            messagesContainer.innerHTML = `
+                <div class="flex items-center justify-center py-10 text-gray-400">
+                    <i class="fa-solid fa-circle-notch fa-spin text-xl accent-text mr-2"></i> Connecting to chat...
+                </div>`;
+
+            unsubscribeMessages = onSnapshot(messagesCol, (snapshot) => {
+                const allMsgs = snapshot.docs.map(d => d.data());
+                
+                const roomMsgs = allMsgs
+                    .filter(m => m.roomId === roomId)
+                    .sort((a, b) => new Date(a.createdAt || 0) - new Date(b.createdAt || 0));
+
+                if (roomMsgs.length === 0) {
+                    messagesContainer.innerHTML = `
+                        <div class="flex flex-col items-center justify-center h-full py-10 text-gray-400 text-center">
+                            <div class="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mb-2 accent-text">
+                                <i class="fa-solid fa-comments"></i>
+                            </div>
+                            <p class="text-xs font-semibold text-gray-300">No messages yet</p>
+                            <p class="text-[10px] text-gray-500 mt-1">Start the conversation!</p>
+                        </div>`;
+                    return;
+                }
+
+                messagesContainer.innerHTML = roomMsgs.map(msg => {
+                    const isMine = currentUserData && msg.senderUid === currentUserData.uid;
+                    const timeStr = msg.createdAt ? new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+
+                    let attachmentHTML = '';
+                    if (msg.attachment) {
+                        if (msg.attachment.type === 'image') {
+                            attachmentHTML = `
+                                <div class="mb-2 max-w-xs overflow-hidden rounded-xl border border-white/20 shadow-md">
+                                    <img src="${escapeHTML(msg.attachment.url)}" alt="Attached Image" class="w-full max-h-56 object-cover cursor-pointer hover:scale-105 transition duration-300" onclick="window.viewAttachmentModal('${escapeHTML(msg.attachment.url)}')">
+                                </div>`;
+                        } else if (msg.attachment.type === 'file') {
+                            attachmentHTML = `
+                                <a href="${escapeHTML(msg.attachment.url)}" download="${escapeHTML(msg.attachment.name)}" target="_blank" class="flex items-center gap-3 bg-black/30 p-2.5 rounded-xl border border-white/15 mb-2 hover:bg-black/50 transition group">
+                                    <div class="w-8 h-8 rounded-lg bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-sm shrink-0">
+                                        <i class="fa-solid fa-file-arrow-down"></i>
+                                    </div>
+                                    <div class="overflow-hidden text-left">
+                                        <p class="text-xs font-semibold text-white truncate group-hover:text-cyan-300 transition">${escapeHTML(msg.attachment.name)}</p>
+                                        <p class="text-[10px] text-gray-400">${escapeHTML(msg.attachment.size || 'Attachment')}</p>
+                                    </div>
+                                </a>`;
+                        }
+                    }
+
+                    if (isMine) {
+                        return `
+                            <div class="flex flex-col items-end space-y-1">
+                                <div class="max-w-[80%] sm:max-w-[70%] glass-btn text-white rounded-2xl rounded-tr-none px-4 py-2.5 text-xs sm:text-sm shadow-lg border border-white/20">
+                                    ${attachmentHTML}
+                                    ${msg.text ? `<p class="break-words">${escapeHTML(msg.text)}</p>` : ''}
+                                </div>
+                                <span class="text-[9px] text-gray-400 px-1">${timeStr}</span>
+                            </div>`;
+                    } else {
+                        return `
+                            <div class="flex items-start gap-2 max-w-[80%] sm:max-w-[70%]">
+                                <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-[10px] font-bold text-white border border-white/20 shrink-0 mt-1">
+                                    ${escapeHTML((msg.senderName || 'U')[0].toUpperCase())}
+                                </div>
+                                <div class="space-y-1">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-[10px] font-bold accent-text">${escapeHTML(msg.senderName)}</span>
+                                        <span class="text-[9px] text-gray-400">${timeStr}</span>
+                                    </div>
+                                    <div class="glass-panel text-gray-100 rounded-2xl rounded-tl-none px-4 py-2.5 text-xs sm:text-sm border border-white/10 shadow-md">
+                                        ${attachmentHTML}
+                                        ${msg.text ? `<p class="break-words">${escapeHTML(msg.text)}</p>` : ''}
+                                    </div>
+                                </div>
+                            </div>`;
+                    }
+                }).join('');
+
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }, (err) => {
+                console.error("Messages snapshot error:", err);
+            });
+        }
+
+        // Send Message Handler
+        document.getElementById('form-send-message').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!currentUserData || !currentRoom) return;
+
+            const inputMsg = document.getElementById('input-message');
+            const text = inputMsg.value.trim();
+            const attachmentToSend = pendingAttachment;
+
+            if (!text && !attachmentToSend) return;
+
+            inputMsg.value = '';
+            pendingAttachment = null;
+            document.getElementById('attachment-preview-bar').classList.add('hidden');
+            document.getElementById('emoji-picker-popover').classList.add('hidden');
+            document.getElementById('attachment-popover').classList.add('hidden');
+
+            try {
+                const newMsgRef = doc(messagesCol);
+                const msgData = {
+                    id: newMsgRef.id,
+                    roomId: currentRoom.id,
+                    senderUid: currentUserData.uid,
+                    senderName: `${currentUserData.firstName} (@${currentUserData.username})`,
+                    text: text,
+                    attachment: attachmentToSend || null,
+                    createdAt: new Date().toISOString()
+                };
+
+                await setDoc(newMsgRef, msgData);
+
+            } catch (err) {
+                console.error("Error sending message:", err);
+                showToast('Failed to send message', 'error');
+            }
+        });
+
+        // HTML Sanitizer Function
+        function escapeHTML(str) {
+            if (!str) return '';
+            return str.replace(/[&<>'"]/g, 
+                tag => ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    "'": '&#39;',
+                    '"': '&quot;'
+                }[tag] || tag)
+            );
+        }
+    </script>
+</body>
+</html>
